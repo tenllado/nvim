@@ -87,7 +87,7 @@ local function null_ls_setup()
 		formatting.black.with({ extra_args = { "--fast" } }), -- for python files
 		formatting.stylua, -- for lua files
 		diagnostics.flake8, -- for python files
---		null_ls.builtins.code_actions.gitsigns, -- gives warning: multiple dfferent client offset_encodings detected for buffer, this is not supported yet
+		null_ls.builtins.code_actions.gitsigns,
 	}
 
 	null_ls.setup({ debug = false, sources = sources })
@@ -141,6 +141,8 @@ local function lsp_servers_setup(lspconfig)
 	local status_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 	if status_ok then
 		capabilities = cmp_nvim_lsp.default_capabilities()
+		-- seems to solve the error: multiple dfferent client offset_encodings detected for buffer, this is not supported yet
+		capabilities.offsetEncoding = { "utf-16" }
 	end
 
 	for _, server in pairs(servers) do
