@@ -1,19 +1,13 @@
 -- Applies defualt options that you usually want, if not present in the opts
--- argument, and accepts the buffer option for buffer local mappings
+-- argument
 -- See:
 -- :h nvim_set_keymap
--- :h nvim_buf_set_keymap
 local keymap = function(mode, lhs, rhs, opts)
 	local defaults = { noremap = true, silent = true }
 	for k, v in pairs(defaults) do
 		opts[k] = v and opts[k] == nil or opts[k]
 	end
-	if opts.buffer then
-		opts.buffer = nil
-		vim.api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
-	else
-		vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
-	end
+	vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
 end
 
 -- :h map-modes
