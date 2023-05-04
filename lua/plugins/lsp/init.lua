@@ -25,6 +25,7 @@ local servers = {
 	"lua_ls", -- TODO: have a look to luau_lsp
 	"vimls",
 	"ltex", -- TODO: compare ltex and texlab
+	-- "marksman",
 }
 
 local function mason_lspconfig_setup()
@@ -78,16 +79,14 @@ local function null_ls_setup()
 	end
 
 	-- Supported tools, look in: https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins/
-	local formatting = null_ls.builtins.formatting
-	local diagnostics = null_ls.builtins.diagnostics
-	-- local code_actions = null_ls.builtins.code_actions
+	local builtins = null_ls.builtins
 
 	local sources = {
-		formatting.prettier.with({ extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
-		formatting.black.with({ extra_args = { "--fast" } }), -- for python files
-		formatting.stylua, -- for lua files
-		diagnostics.flake8, -- for python files
-		null_ls.builtins.code_actions.gitsigns,
+		builtins.formatting.prettier.with({ extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
+		builtins.formatting.black.with({ extra_args = { "--fast" } }), -- for python files
+		builtins.formatting.stylua, -- for lua files
+		builtins.diagnostics.flake8, -- for python files
+		builtins.code_actions.gitsigns,
 	}
 
 	null_ls.setup({ debug = false, sources = sources })
@@ -113,14 +112,15 @@ local function lsp_keymaps(bufnr)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<A-k>", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<A-j>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-	-- vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-	-- vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>f", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ld", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ll", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>lf", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>', opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", '<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>l", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
 	vim.cmd([[ command! Format execute 'lua vim.lsp.buf.format()' ]]) -- TODO: find a good keymap
 end
 
@@ -166,7 +166,7 @@ local M = {
 	},
 	{
 		"jose-elias-alvarez/null-ls.nvim", -- Allows the use of non-LSP aware tools with neovim's LSP
-		dependencies = {"nvim-lua/plenary.nvim"},
+		dependencies = { "nvim-lua/plenary.nvim" },
 	},
 	{
 		"neovim/nvim-lspconfig", -- configure the LSP
@@ -179,7 +179,7 @@ local M = {
 			lsp_servers_setup(require("lspconfig"))
 			null_ls_setup()
 		end,
-	},
+	}
 }
 
 return M

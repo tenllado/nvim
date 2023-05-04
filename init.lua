@@ -25,7 +25,7 @@ local status_ok, lazy = pcall(require, "lazy")
 if status_ok then
 	-- plugins are modules in the lua/plugins directory
 	-- Each module declares and configures one or more plugins
-	lazy.setup("plugins", {change_detection = {notify = false}})
+	lazy.setup("plugins", { change_detection = { notify = false } })
 end
 
 -- Neo/vim options
@@ -36,7 +36,7 @@ vim.opt.backup = false -- creates a backup file
 vim.opt.clipboard = "unnamedplus" -- allows neovim to access the system clipboard
 vim.opt.cmdheight = 2 -- more space in the neovim command line for displaying messages
 vim.opt.colorcolumn = { "+1" } -- highlight column 81
-vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
 --vim.opt.conceallevel = 0 -- so that `` is visible in markdown files
 vim.opt.cursorline = true -- highlight the current line
 vim.opt.expandtab = false -- do not convert tabs to spaces
@@ -61,7 +61,7 @@ vim.opt.smartindent = true -- make indenting smarter again
 vim.opt.smarttab = true -- A tab in front of line inserts blanks according to shiftwidth
 vim.opt.softtabstop = 4
 -- vim.opt.splitbelow = true                       -- force all horizontal splits to go below current window
-vim.opt.splitright = true                       -- force all vertical splits to go to the right of current window
+vim.opt.splitright = true -- force all vertical splits to go to the right of current window
 vim.opt.swapfile = false -- creates a swapfile
 vim.opt.scrolloff = 8 -- minimal number of lines above/bellow the cursor to keep shown
 vim.opt.sidescrolloff = 8 -- minimal number of left/right columns to keep around cursor
@@ -77,6 +77,7 @@ vim.opt.wrap = false -- do not wrap long lines
 vim.opt.shortmess:append("c")
 vim.opt.path:append("**") -- search down into subfolders, with tab-completion for all file operations
 -- vim.opt.sessionoptions:append("globals")
+-- vim.g.spellfile_URL = "https://ftp.nluug.nl/vim/runtime/spell/"
 
 vim.cmd("set whichwrap+=<,>,[,],h,l")
 --vim.cmd([[set iskeyword+=-]])
@@ -91,3 +92,13 @@ vim.g.netrw_winsize = 20
 -- keymaps go in a different file, which makes it ease to source it if I add a
 -- new mapping, just by :so
 require("keymaps")
+
+-- some autocommands
+local conceal = vim.api.nvim_create_augroup("conceal", { clear = true })
+vim.api.nvim_create_autocmd({ "BufEnter", "BufNew", "BufNewFile" }, {
+	pattern = { "*.md" },
+	command = "setlocal conceallevel=2",
+	group = conceal,
+	desc = "set conceallevel=2 for markdown files"
+})
+
