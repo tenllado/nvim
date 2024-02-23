@@ -1,24 +1,22 @@
-local M = {
+-- Lualine has sections as shown below
+-- +-------------------------------------------------+
+-- | A | B | C                             X | Y | Z |
+-- +-------------------------------------------------+
+
+return {
 	{
 		"nvim-lualine/lualine.nvim",
+		dependencies = {'nvim-tree/nvim-web-devicons'},
 		opts = {
 			options = {
-				icons_enabled = true,
-				theme = "auto",
 				component_separators = { left = "", right = "" },
 				section_separators = { left = "", right = "" },
-				-- section_separators = { left = '', right = '' },
-				-- component_separators = { left = '', right = '' },
-				-- component_separators = { left = "", right = "" },
-				-- section_separators = { left = "", right = "" },
 				disabled_filetypes = { "dashboard", "NvimTree", "Outline", "netrw" },
-				always_divide_middle = true,
 			},
 			sections = {
 				lualine_a = {
 					{
 						"branch",
-						icons_enabled = true,
 						icon = "",
 					},
 					{
@@ -43,7 +41,7 @@ local M = {
 					{
 						"filename",
 						file_status = true,
-						newfile_status = false,
+						newfile_status = true,
 						path = 1, -- 1: Relative path
 						shorting_target = 40, -- Shortens path to leave 40 spaces in the window
 						symbols = {
@@ -104,5 +102,3 @@ local M = {
 		},
 	},
 }
-
-return M

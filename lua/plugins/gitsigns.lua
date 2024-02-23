@@ -3,49 +3,12 @@ local M = {
 		"lewis6991/gitsigns.nvim",
 		opts = {
 			signs = {
-				add = {
-					hl = "GitSignsAdd",
-					-- text = "▎",
-					-- text = '┃'
-					text = "│",
-					numhl = "GitSignsAddNr",
-					linehl = "GitSignsAddLn",
-				},
-				change = {
-					hl = "GitSignsChange",
-					-- text = "▎",
-					-- text = '┃'
-					text = "│",
-					numhl = "GitSignsChangeNr",
-					linehl = "GitSignsChangeLn",
-				},
-				delete = {
-					hl = "GitSignsDelete",
-					-- text = "契",
-					-- text = '▁'
-					text = "_",
-					numhl = "GitSignsDeleteNr",
-					linehl = "GitSignsDeleteLn",
-				},
-				topdelete = {
-					hl = "GitSignsDelete",
-					-- text = "契",
-					-- text = '▔'
-					text = "‾",
-					numhl = "GitSignsDeleteNr",
-					linehl = "GitSignsDeleteLn",
-				},
-				changedelete = {
-					hl = "GitSignsChange",
-					-- text = "▎",
-					text = "~",
-					numhl = "GitSignsChangeNr",
-					linehl = "GitSignsChangeLn",
-				},
-				untracked = {
-					hl = "GitSignsUntracked",
-					text = "┆",
-				},
+				add = { text = "+" },
+				change = { text = "x" },
+				delete = { text = "-" },
+				untracked = { text = "┆" },
+				topdelete = { text = "T" },
+				changedelete = { text = "~" },
 			},
 			watch_gitdir = {
 				enable = true,
@@ -54,8 +17,8 @@ local M = {
 			},
 			sign_priority = 6,
 			signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
-			numhl = false, -- Toggle with `:Gitsigns toggle_numhl`
-			linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
+			numhl = true,      -- Toggle with `:Gitsigns toggle_numhl`
+			linehl = false,    -- Toggle with `:Gitsigns toggle_linehl`
 			word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
 			attach_to_untracked = true,
 			current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
@@ -82,57 +45,55 @@ local M = {
 			yadm = {
 				enable = false,
 			},
-			on_attach = function(bufnr)
+			on_attach = function (bufnr)
 				local gs = package.loaded.gitsigns
 
-				local function map(mode, l, r, opts)
-					opts = opts or {}
-					opts.buffer = bufnr
-					vim.keymap.set(mode, l, r, opts)
-				end
-
-				-- Navigation
-				map("n", "]c", function()
+				local function next_hunk()
 					if vim.wo.diff then
 						return "]c"
 					end
-					vim.schedule(function()
-						gs.next_hunk()
-					end)
+					vim.schedule(function () gs.next_hunk() end)
 					return "<Ignore>"
-				end, { expr = true })
+				end
 
-				map("n", "[c", function()
+				local function prev_hunk()
 					if vim.wo.diff then
 						return "[c"
 					end
-					vim.schedule(function()
-						gs.prev_hunk()
-					end)
+					vim.schedule(function () gs.prev_hunk() end)
 					return "<Ignore>"
-				end, { expr = true })
+				end
 
-				-- Actions: h is for hunk
-				map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>")
-				map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>")
-				map("n", "<leader>hS", gs.stage_buffer)
-				map("n", "<leader>hu", gs.undo_stage_hunk)
-				map("n", "<leader>hR", gs.reset_buffer)
-				map("n", "<leader>hp", gs.preview_hunk)
-				map("n", "<leader>hb", function()
+				local function blame_line()
 					gs.blame_line({ full = true })
-				end)
-				map("n", "<leader>tb", gs.toggle_current_line_blame)
-				map("n", "<leader>hd", gs.diffthis)
-				map("n", "<leader>hq", gs.setqflist)
-				map("n", "<leader>hl", gs.setloclist)
-				map("n", "<leader>hD", function()
-					gs.diffthis("~")
-				end)
-				map("n", "<leader>td", gs.toggle_deleted)
+				end
 
-				-- Text object: in hunk
-				map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
+				local mappings = {
+					["n"] = {
+						["<leader>hS"] = gs.stage_buffer,
+						["<leader>hu"] = gs.undo_stage_hunk,
+						["<leader>hR"] = gs.reset_buffer,
+						["<leader>hp"] = gs.preview_hunk,
+						["<leader>tb"] = gs.toggle_current_line_blame,
+						["<leader>hd"] = gs.diffthis,
+						["<leader>hq"] = gs.setqflist,
+						["<leader>hl"] = gs.setloclist,
+						["<leader>hb"] = blame_line,
+						["<leader>hD"] = function () gs.diffthis("~") end,
+						["<leader>td"] = gs.toggle_deleted,
+						["[h"] = { prev_hunk, { expr = true } },
+						["]h"] = { next_hunk, { expr = true } },
+					},
+					[{ "n", "v" }] = {
+						["<leader>hs"] = ":Gitsigns stage_hunk<CR>",
+						["<leader>hr"] = ":Gitsigns reset_hunk<CR>",
+					},
+					[{ "o", "x" }] = {
+						["ih"] = ":<C-U>Gitsigns select_hunk<CR>",
+					}
+				}
+
+				require("keymaps").set_mappings(mappings)
 			end,
 		},
 	},

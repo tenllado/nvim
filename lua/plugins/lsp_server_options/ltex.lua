@@ -1,5 +1,5 @@
 return {
-	filetypes = { "markdown", "md", "tex" },
+	filetypes = { "latex", "bibtex" },
 	autostart = false,
 	settings = {
 		ltex = {
